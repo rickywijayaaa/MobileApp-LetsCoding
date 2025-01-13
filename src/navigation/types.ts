@@ -5,6 +5,7 @@ export type RootStackParamList = {
   };
   
   export type AuthStackParamList = {
+    Splash: undefined;
     Login: undefined;
     Register: undefined;
     ForgotPassword: undefined;
@@ -16,3 +17,4 @@ export type RootStackParamList = {
     Practice: undefined;
     Profile: undefined;
   };
+  
