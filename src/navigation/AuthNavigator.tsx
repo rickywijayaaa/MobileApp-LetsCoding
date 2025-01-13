@@ -3,8 +3,9 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { AuthStackParamList } from './types';
 import SplashScreen from '../components/screens/main/SplashScreen';
+import  HomeScreen  from '../components/screens/main/HomeScreen';
 import  LoginScreen  from '../components/screens/auth/LoginScreen';
-import { RegisterScreen } from '../components/screens/auth/RegisterScreen';
+import  RegisterScreen  from '../components/screens/auth/RegisterScreen';
 import { ForgotPasswordScreen } from '../components/screens/auth/ForgotPasswordScreen';
 
 const Stack = createStackNavigator<AuthStackParamList>();
@@ -20,6 +21,7 @@ export const AuthNavigator = () => {
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+      <Stack.Screen name ="Home" component={HomeScreen} />
     </Stack.Navigator>
   );
 };

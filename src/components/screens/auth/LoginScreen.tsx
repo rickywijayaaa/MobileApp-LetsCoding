@@ -1,43 +1,55 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Dimensions } from 'react-native';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../../services/firebase/config';
 
-const { width, height } = Dimensions.get('window'); // Get device screen dimensions
+const { width } = Dimensions.get('window');
 
-const LoginScreen: React.FC = () => {
+const LoginScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    setLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      Alert.alert('Success', 'Logged in successfully!', [
+        { text: 'OK', onPress: () => navigation.replace('Home') },
+      ]);
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to log in.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      {/* Background */}
-      <View style={styles.background} />
-
-      {/* Welcome Text */}
-      <Text style={styles.welcomeText}>Welcome back!</Text>
-
-      {/* Email and Password Fields */}
-      <View style={styles.inputContainer}>
-        <View style={styles.inputBox}>
-          <Text style={styles.inputLabel}>Email</Text>
-        </View>
-        <View style={styles.inputBox}>
-          <Text style={styles.inputLabel}>Password</Text>
-        </View>
-      </View>
-
-      {/* Login Button */}
-      <TouchableOpacity style={styles.loginButton}>
-        <Text style={styles.loginButtonText}>Login</Text>
-      </TouchableOpacity>
-
-      {/* Sign in with Google Button */}
-      <TouchableOpacity style={styles.googleButton}>
-        <Image source={require('../../../assets/google_icon.png')} style={styles.googleIcon} />
-        <Text style={styles.googleButtonText}>Sign in with Google</Text>
-      </TouchableOpacity>
-
-      {/* Placeholder Image */}
-      <Image
-        source={require('../../../assets/appicon.png')}
-        style={styles.placeholderImage}
+      <Text style={styles.title}>Login</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        placeholderTextColor="#999"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        placeholderTextColor="#999"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+      <TouchableOpacity style={[styles.button, loading && { opacity: 0.7 }]} onPress={handleLogin} disabled={loading}>
+        <Text style={styles.buttonText}>{loading ? 'Logging in...' : 'Login'}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+        <Text style={styles.link}>Don't have an account? Register</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -45,117 +57,43 @@ const LoginScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#FDFDFE',
-    position: 'relative',
   },
-  background: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#FDFDFD',
-    position: 'absolute',
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
-  welcomeText: {
-    position: 'absolute',
-    top: height * 0.28, // Adjusted for iPhone 11
-    left: width * 0.3,
-    textAlign: 'center',
-    color: 'black',
-    fontSize: width * 0.065, // Responsive font size
-    fontFamily: 'Work Sans',
-    fontWeight: '400',
-    lineHeight: width * 0.09, // Adjusted line height
-    letterSpacing: 0.8,
-  },
-  inputContainer: {
-    position: 'absolute',
-    top: height * 0.35,
-    left: width * 0.05,
-  },
-  inputBox: {
+  input: {
     width: width * 0.9,
-    height: height * 0.065,
-    backgroundColor: 'white',
-    borderRadius: 10,
+    height: 50,
+    backgroundColor: '#fff',
+    borderColor: '#ddd',
     borderWidth: 1,
-    borderColor: 'black',
-    marginBottom: height * 0.02,
-    justifyContent: 'center',
-    paddingLeft: width * 0.04,
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    marginBottom: 15,
   },
-  inputLabel: {
-    color: 'black',
-    fontSize: width * 0.045,
-    fontFamily: 'Work Sans',
-    fontWeight: '400',
-  },
-  passwordMask: {
-    width: width * 0.06,
-    height: height * 0.015,
-    backgroundColor: 'black',
-    opacity: 0.5,
-    position: 'absolute',
-    right: width * 0.04,
-    top: '50%',
-    transform: [{ translateY: -height * 0.0075 }],
-  },
-  forgotPassword: {
-    position: 'absolute',
-    top: height * 0.45,
-    left: width * 0.6,
-    textAlign: 'right',
-    color: 'black',
-    fontSize: width * 0.035,
-    fontFamily: 'Work Sans',
-    fontWeight: '400',
-  },
-  loginButton: {
-    position: 'absolute',
-    top: height * 0.51,
-    left: width * 0.05,
+  button: {
     width: width * 0.9,
-    height: height * 0.075,
+    height: 50,
     backgroundColor: '#4D2C5E',
-    borderRadius: 10,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  loginButtonText: {
-    color: 'white',
-    fontSize: width * 0.05,
-    fontFamily: 'Work Sans',
-    fontWeight: '700',
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
   },
-  googleButton: {
-    position: 'absolute',
-    top: height * 0.6,
-    left: width * 0.05,
-    width: width * 0.9,
-    height: height * 0.075,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    borderWidth: 1.36,
-    borderColor: 'black',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  googleIcon: {
-    width: height * 0.04,
-    height: height * 0.04,
-    marginRight: width * 0.02,
-  },
-  googleButtonText: {
-    color: 'black',
-    fontSize: width * 0.045,
-    fontFamily: 'Work Sans',
-    fontWeight: '500',
-  },
-  placeholderImage: {
-    position: 'absolute',
-    top: height * 0.11,
-    left: width * 0.28,
-    width: width * 0.5,
-    height: height * 0.2,
+  link: {
+    marginTop: 15,
+    fontSize: 16,
+    color: '#0098FF',
   },
 });
 

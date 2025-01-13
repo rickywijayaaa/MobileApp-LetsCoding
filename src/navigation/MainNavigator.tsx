@@ -12,7 +12,6 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 export const MainNavigator = () => {
   return (
     <Tab.Navigator>
-      <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Learn" component={LearnScreen} />
       <Tab.Screen name="Practice" component={PracticeScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
