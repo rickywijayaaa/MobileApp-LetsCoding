@@ -20,3 +20,5 @@ const styles = StyleSheet.create({
     padding: theme.spacing.lg,
   },
 });
+
+export default HomeScreen;

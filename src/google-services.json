@@ -1,0 +1,39 @@
+{
+    "project_info": {
+      "project_number": "385249045633",
+      "project_id": "letscoding-92627",
+      "storage_bucket": "letscoding-92627.firebasestorage.app"
+    },
+    "client": [
+      {
+        "client_info": {
+          "mobilesdk_app_id": "1:385249045633:android:f4c067daf1227ad0db7180",
+          "android_client_info": {
+            "package_name": "com.letscoding"
+          }
+        },
+        "oauth_client": [
+          {
+            "client_id": "385249045633-9pqlqpu2bs8m5jlk67tt65riuo3otu1u.apps.googleusercontent.com",
+            "client_type": 3
+          }
+        ],
+        "api_key": [
+          {
+            "current_key": "AIzaSyC3XBFMfOJFm_eSc0dllb20LqdRtGpZ3g4"
+          }
+        ],
+        "services": {
+          "appinvite_service": {
+            "other_platform_oauth_client": [
+              {
+                "client_id": "385249045633-9pqlqpu2bs8m5jlk67tt65riuo3otu1u.apps.googleusercontent.com",
+                "client_type": 3
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "configuration_version": "1"
+  }
