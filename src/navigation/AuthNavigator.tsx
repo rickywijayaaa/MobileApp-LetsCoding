@@ -3,12 +3,12 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AuthStackParamList, MainTabParamList } from './types';
-import SplashScreen from '../components/screens/main/SplashScreen';
-import LoginScreen from '../components/screens/auth/LoginScreen';
-import RegisterScreen from '../components/screens/auth/RegisterScreen';
-import { HomeScreen } from '../components/screens/main/HomeScreen';
-import { LearnScreen } from '../components/screens/main/LearnScreen';
-import  ProfileScreen  from '../components/screens/main/ProfileScreen';
+import SplashScreen from '../screens/SplashScreen';
+import LoginScreen from '../screens/auth/LoginScreen';
+import RegisterScreen from '../screens/auth/RegisterScreen';
+import { HomeScreen } from '../screens/main/HomeScreen';
+import { LearnScreen } from '../screens/main/LearnScreen';
+import ProfileScreen from '../screens/main/ProfileScreen';
 import { Image } from 'react-native';
 
 const Stack = createStackNavigator<AuthStackParamList>();
