@@ -21,10 +21,8 @@ import { registerUser, clearError } from '../../store/slices/authSlice';
 import { theme } from '../../theme';
 import { moderateScale, verticalScale, horizontalScale } from '../../utils/responsive';
 
-// Get device dimensions for responsive design
 const { width, height } = Dimensions.get('window');
 
-// Password validation requirements
 const passwordRequirements = {
   minLength: 8,
   hasUpperCase: /[A-Z]/,
@@ -36,20 +34,17 @@ const passwordRequirements = {
 const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const dispatch = useAppDispatch();
   const { loading, error } = useAppSelector(state => state.auth);
-  
-  // Form state
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-  
-  // Validation state
+
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
 
-  // Monitor keyboard visibility
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -66,12 +61,10 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     };
   }, []);
 
-  // Clear error on mount
   useEffect(() => {
     dispatch(clearError());
   }, []);
 
-  // Handle API errors
   useEffect(() => {
     if (error) {
       Alert.alert('Registration Error', error, [
@@ -80,7 +73,6 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     }
   }, [error]);
 
-  // Validate email format
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isValid = emailRegex.test(email);
@@ -88,10 +80,9 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     return isValid;
   };
 
-  // Validate password strength
   const validatePassword = (password: string): boolean => {
     const errors = [];
-    
+
     if (password.length < passwordRequirements.minLength) {
       errors.push(`At least ${passwordRequirements.minLength} characters`);
     }
@@ -112,21 +103,17 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     return errors.length === 0;
   };
 
-  // Validate password confirmation
   const validateConfirmPassword = (password: string, confirmPassword: string): boolean => {
     const isValid = password === confirmPassword;
     setConfirmPasswordError(isValid ? '' : 'Passwords do not match');
     return isValid;
   };
 
-  // Handle registration
   const handleRegister = async () => {
-    // Reset errors
     setEmailError('');
     setPasswordError('');
     setConfirmPasswordError('');
 
-    // Validate all fields
     const isEmailValid = validateEmail(email);
     const isPasswordValid = validatePassword(password);
     const isConfirmPasswordValid = validateConfirmPassword(password, confirmPassword);
@@ -137,7 +124,11 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
     try {
       await dispatch(registerUser({ email, password })).unwrap();
-      // Registration successful - navigation will be handled by auth state
+
+      // Show success alert before navigation
+      Alert.alert('Success', 'Account created successfully!', [
+        { text: 'OK', onPress: () => navigation.navigate('Login') }
+      ]);
     } catch (error) {
       // Error is handled by the error effect
     }
@@ -153,7 +144,6 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           contentContainerStyle={styles.scrollContainer}
           showsVerticalScrollIndicator={false}
         >
-          {/* Logo Section - Hidden when keyboard is visible on small screens */}
           {(!isKeyboardVisible || height > 700) && (
             <View style={styles.logoContainer}>
               <Image
@@ -165,7 +155,6 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             </View>
           )}
 
-          {/* Input Section */}
           <View style={styles.inputContainer}>
             <View style={styles.inputWrapper}>
               <TextInput
@@ -232,7 +221,6 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             </View>
           </View>
 
-          {/* Action Buttons */}
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={[styles.registerButton, loading && styles.disabledButton]}
@@ -247,7 +235,6 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          {/* Navigation Link */}
           <View style={styles.linkContainer}>
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
               <Text style={styles.link}>Already have an account? Login</Text>
