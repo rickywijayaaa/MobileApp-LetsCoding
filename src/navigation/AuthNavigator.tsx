@@ -8,7 +8,7 @@ import LoginScreen from '../components/screens/auth/LoginScreen';
 import RegisterScreen from '../components/screens/auth/RegisterScreen';
 import { HomeScreen } from '../components/screens/main/HomeScreen';
 import { LearnScreen } from '../components/screens/main/LearnScreen';
-import { ProfileScreen } from '../components/screens/main/ProfileScreen';
+import  ProfileScreen  from '../components/screens/main/ProfileScreen';
 import { Image } from 'react-native';
 
 const Stack = createStackNavigator<AuthStackParamList>();
