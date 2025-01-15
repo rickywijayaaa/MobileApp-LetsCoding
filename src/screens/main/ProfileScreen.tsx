@@ -1,6 +1,7 @@
+// src/screens/main/ProfileScreen.tsx
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
-import { auth } from '../../../services/firebase/config';
+import { auth } from '../../services/firebase/config';
 import { signOut } from 'firebase/auth';
 
 const { width, height } = Dimensions.get('window');
@@ -20,12 +21,12 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       {/* Profile Image Section */}
       <View style={styles.profileSection}>
         <Image
-          source={require('../../../assets/profile-picture.png')} // Replace with your profile picture
+          source={require('../../assets/profile-picture.png')} // Replace with your profile picture
           style={styles.profileImage}
         />
         <TouchableOpacity style={styles.editIcon}>
           <Image
-            source={require('../../../assets/edit-icon.jpg')} // Replace with your edit icon
+            source={require('../../assets/edit-icon.jpg')} // Replace with your edit icon
             style={styles.iconImage}
           />
         </TouchableOpacity>

@@ -11,11 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#4D2C5E"
     },
-    "assetBundlePatterns": [
-      "**/*",
-      "assets/flow-splash.json",
-      "assets/icons/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.virtuallab.mobile"
@@ -26,15 +22,6 @@
         "backgroundColor": "#4D2C5E"
       },
       "package": "com.virtuallab.mobile"
-    },
-    "updates": {
-      "fallbackToCacheTimeout": 0,
-      "url": "https://u.expo.dev/396b4c3d-7001-47a5-9f66-f99c6e119458"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "396b4c3d-7001-47a5-9f66-f99c6e119458"
-      }
     }
   }
 }

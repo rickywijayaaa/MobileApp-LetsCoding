@@ -1,8 +1,8 @@
 // src/screens/main/LearnScreen.tsx
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Typography } from '../../../components/common/Typography/Typography';
-import { theme } from '../../../theme';
+import { Typography } from '../../components/common/Typography/Typography';
+import { theme } from '../../theme';
 
 export const LearnScreen: React.FC = () => {
   return (

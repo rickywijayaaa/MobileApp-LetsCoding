@@ -1,318 +1,198 @@
 // src/screens/auth/LoginScreen.tsx
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  Dimensions,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Alert,
-  StyleSheet
-} from 'react-native';
-import { useAppDispatch } from '../../store/hooks';
-import { loginUser } from '../../store/slices/authSlice';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AuthStackParamList } from '../../navigation/types';
-import { FontAwesome } from '@expo/vector-icons';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, Alert, Dimensions } from 'react-native';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../services/firebase/config';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+
+WebBrowser.maybeCompleteAuthSession();
 
 const { width, height } = Dimensions.get('window');
 
-// Type definitions
-type LoginScreenProps = NativeStackScreenProps<AuthStackParamList, 'Login'>;
+const LoginScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-interface FormData {
-  email: string;
-  password: string;
-}
-
-const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
-  // State management with proper typing
-  const [formData, setFormData] = useState<FormData>({
-    email: '',
-    password: ''
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    clientId: '385249045633-9pqlqpu2bs8m5jlk67tt65riuo3otu1u.apps.googleusercontent.com',
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const dispatch = useAppDispatch();
 
-  // Email validation with proper error handling
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  React.useEffect(() => {
+    if (response?.type === 'success') {
+      const { id_token } = response.params;
 
-  // Enhanced login handler with proper error management
+      // Handle Google Sign-In logic
+      if (id_token) {
+        Alert.alert('Success', 'Signed in with Google successfully!', [
+          { text: 'OK', onPress: () => navigation.replace('Home') },
+        ]);
+      } else {
+        Alert.alert('Error', 'Google Sign-In failed.');
+      }
+    }
+  }, [response]);
+
   const handleLogin = async () => {
+    setLoading(true);
     try {
-      // Form validation
-      if (!formData.email || !formData.password) {
-        Alert.alert('Error', 'Please fill in all fields');
-        return;
-      }
-
-      if (!validateEmail(formData.email)) {
-        Alert.alert('Error', 'Please enter a valid email address');
-        return;
-      }
-
-      setIsLoading(true);
-      
-      // Dispatch login action to Redux store
-      await dispatch(loginUser({
-        email: formData.email,
-        password: formData.password
-      })).unwrap();
-
-      // If login successful, navigation will be handled by auth state change
-      
-    } catch (error) {
-        Alert.alert(
-          'Login Failed',
-          error instanceof Error ? error.message : 'Please try again'
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-  // Social login handler with proper typing
-  const handleSocialLogin = async (provider: 'facebook' | 'google' | 'apple') => {
-    try {
-      setIsLoading(true);
-      // Implement social login logic here
-      console.log(`${provider} login attempted`);
-      // Add your social authentication logic
-    } catch (error) {
-      Alert.alert('Error', `${provider} login failed`);
+      await signInWithEmailAndPassword(auth, email, password);
+      Alert.alert('Success', 'Logged in successfully!', [
+        { text: 'OK', onPress: () => navigation.replace('Home') },
+      ]);
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to log in.');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
-      <ScrollView 
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-      >
-        <Image
-          source={require('../../../assets/icon.png')}
-          style={styles.logo}
-          resizeMode="contain"
+    <View style={styles.container}>
+      {/* Background */}
+      <View style={styles.background} />
+
+      {/* Welcome Text */}
+      <Text style={styles.welcomeText}>Welcome back!</Text>
+
+      {/* Email and Password Fields */}
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.inputBox}
+          placeholder="Email"
+          placeholderTextColor="#999"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
+        <TextInput
+          style={styles.inputBox}
+          placeholder="Password"
+          placeholderTextColor="#999"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+      </View>
 
-        <Text style={styles.welcomeText}>
-          Welcome back!
-        </Text>
+      {/* Login Button */}
+      <TouchableOpacity
+        style={[styles.loginButton, loading && { opacity: 0.7 }]}
+        onPress={handleLogin}
+        disabled={loading}
+      >
+        <Text style={styles.loginButtonText}>{loading ? 'Logging in...' : 'Login'}</Text>
+      </TouchableOpacity>
 
-        <View style={styles.formContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            placeholderTextColor="rgba(0,0,0,0.5)"
-            value={formData.email}
-            onChangeText={(text) => setFormData(prev => ({ ...prev, email: text }))}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoComplete="email"
-          />
+      {/* Google Sign-In Button */}
+      <TouchableOpacity
+        style={[styles.googleButton, !request && { opacity: 0.5 }]}
+        onPress={() => promptAsync()}
+        disabled={!request}
+      >
+        <Image source={require('../../assets/google_icon.png')} style={styles.googleIcon} />
+        <Text style={styles.googleButtonText}>Sign in with Google</Text>
+      </TouchableOpacity>
 
-          <View style={styles.passwordContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Password"
-              placeholderTextColor="rgba(0,0,0,0.5)"
-              value={formData.password}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, password: text }))}
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-              autoComplete="password"
-            />
-            <TouchableOpacity 
-              style={styles.eyeIcon}
-              onPress={() => setShowPassword(!showPassword)}
-            >
-              <Text>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
-            </TouchableOpacity>
-          </View>
+      {/* Register Navigation */}
+      <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+        <Text style={styles.link}>Don't have an account? Register</Text>
+      </TouchableOpacity>
 
-          <TouchableOpacity 
-            onPress={() => navigation.navigate('ForgotPassword')}
-            style={styles.forgotPasswordContainer}
-          >
-            <Text style={styles.forgotPassword}>
-              Forgot password?
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
-            onPress={handleLogin}
-            disabled={isLoading}
-          >
-            <Text style={styles.loginButtonText}>
-              {isLoading ? 'Logging in...' : 'Login'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.divider}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>or</Text>
-          <View style={styles.dividerLine} />
-        </View>
-
-        <View style={styles.socialContainer}>
-        {(['facebook', 'google', 'apple'] as const).map((provider) => (
-            <TouchableOpacity
-            key={provider}
-            style={styles.socialButton}
-            onPress={() => handleSocialLogin(provider)}
-            disabled={isLoading}
-            >
-            <FontAwesome 
-                name={provider}
-                size={24} 
-                color="#4D2C5E"
-            />
-            </TouchableOpacity>
-        ))}
-        </View>
-
-        <View style={styles.signUpContainer}>
-          <Text style={styles.signUpText}>
-            Don't have an account?{' '}
-          </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-            <Text style={styles.signUpLink}>
-              Sign up
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      {/* Placeholder Image */}
+      <Image
+        source={require('../../assets/appicon.png')}
+        style={styles.placeholderImage}
+      />
+    </View>
   );
 };
 
-// Styles remain the same as before
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FDFDFE',
+    position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  scrollContainer: {
-    flexGrow: 1,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  logo: {
-    width: width * 0.5,
-    height: height * 0.15,
-    alignSelf: 'center',
-    marginTop: height * 0.05,
+  background: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#FDFDFD',
+    position: 'absolute',
   },
   welcomeText: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#000',
+    position: 'absolute',
+    top: height * 0.26,
     textAlign: 'center',
-    marginTop: height * 0.03,
-    marginBottom: height * 0.04,
+    color: 'black',
+    fontSize: width * 0.065,
+    fontWeight: '400',
   },
-  formContainer: {
-    width: '100%',
+  inputContainer: {
+    marginTop: height * 0.05,
   },
-  input: {
-    height: 50,
-    backgroundColor: '#FFF',
+  inputBox: {
+    width: width * 0.9,
+    height: height * 0.065,
+    backgroundColor: 'white',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#4D2C5E',
-    paddingHorizontal: 15,
-    marginBottom: 15,
-    fontSize: 16,
-  },
-  passwordContainer: {
-    position: 'relative',
-  },
-  eyeIcon: {
-    position: 'absolute',
-    right: 15,
-    top: 12,
-  },
-  forgotPasswordContainer: {
-    alignItems: 'flex-end',
-    marginBottom: 20,
-  },
-  forgotPassword: {
-    color: '#4D2C5E',
+    borderColor: 'black',
+    marginBottom: height * 0.02,
+    paddingLeft: width * 0.04,
+    fontSize: width * 0.045,
   },
   loginButton: {
+    width: width * 0.9,
+    height: height * 0.075,
     backgroundColor: '#4D2C5E',
-    height: 50,
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  loginButtonDisabled: {
-    opacity: 0.7,
+    marginTop: height * 0.02,
   },
   loginButtonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: '600',
+    color: 'white',
+    fontSize: width * 0.05,
+    fontWeight: '700',
   },
-  divider: {
+  googleButton: {
+    width: width * 0.9,
+    height: height * 0.075,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    borderWidth: 1.36,
+    borderColor: 'black',
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 30,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: 'rgba(0,0,0,0.2)',
-  },
-  dividerText: {
-    marginHorizontal: 10,
-    color: '#000',
-  },
-  socialContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    marginBottom: 30,
-  },
-  socialButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#FFF',
-    borderWidth: 1,
-    borderColor: '#4D2C5E',
     justifyContent: 'center',
-    alignItems: 'center',
+    marginTop: height * 0.02,
   },
-  socialIcon: {
-    width: 25,
-    height: 25,
+  googleIcon: {
+    width: height * 0.04,
+    height: height * 0.04,
+    marginRight: width * 0.02,
   },
-  signUpContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+  googleButtonText: {
+    color: 'black',
+    fontSize: width * 0.045,
+    fontWeight: '500',
   },
-  signUpText: {
-    color: '#000',
+  link: {
+    marginTop: height * 0.02,
+    fontSize: width * 0.045,
+    color: '#0098FF',
   },
-  signUpLink: {
-    color: '#4D2C5E',
-    fontWeight: '600',
+  placeholderImage: {
+    position: 'absolute',
+    top: height * 0.09,
+    width: width * 0.5,
+    height: height * 0.2,
+    resizeMode: 'contain',
   },
 });
 

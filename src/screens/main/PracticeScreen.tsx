@@ -1,13 +1,13 @@
-// src/screens/main/HomeScreen.tsx
+// src/screens/main/PracticeScreen.tsx
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Typography } from '../../../components/common/Typography/Typography';
-import { theme } from '../../../theme';
+import { Typography } from '../../components/common/Typography/Typography';
+import { theme } from '../../theme';
 
-export const HomeScreen: React.FC = () => {
+export const PracticeScreen: React.FC = () => {
   return (
     <View style={styles.container}>
-      <Typography variant="h1">Home</Typography>
+      <Typography variant="h1">Practice</Typography>
     </View>
   );
 };
@@ -20,5 +20,3 @@ const styles = StyleSheet.create({
     padding: theme.spacing.lg,
   },
 });
-
-export default HomeScreen;
