@@ -7,6 +7,7 @@ const config: ExpoConfig = {
   owner: 'letscoding',
   version: '1.0.0',
   orientation: 'portrait',
+  scheme: 'virtuallab', // Add URL scheme for deep linking
   userInterfaceStyle: 'light',
   updates: {
     fallbackToCacheTimeout: 0,
