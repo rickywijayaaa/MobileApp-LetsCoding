@@ -16,6 +16,13 @@
         "backgroundColor": "#4D2C5E"
       },
       "package": "com.virtuallab.mobile"
+    },
+    "web": {
+      "favicon": "./src/assets/favicon.png",
+      "bundler": "metro", 
+      "build": {
+        "output": "build"
+      }
     }
   }
 }
