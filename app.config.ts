@@ -7,13 +7,7 @@ const config: ExpoConfig = {
   owner: 'letscoding',
   version: '1.0.0',
   orientation: 'portrait',
-  icon: './assets/icon.png',
   userInterfaceStyle: 'light',
-  splash: {
-    image: './assets/splash.png',
-    resizeMode: 'contain',
-    backgroundColor: '#4D2C5E'
-  },
   updates: {
     fallbackToCacheTimeout: 0,
     url: 'https://u.expo.dev/396b4c3d-7001-47a5-9f66-f99c6e119458'
@@ -25,7 +19,7 @@ const config: ExpoConfig = {
   },
   android: {
     adaptiveIcon: {
-      foregroundImage: './assets/adaptive-icon.png',
+      foregroundImage: './src/assets/appicon.png',
       backgroundColor: '#4D2C5E'
     },
     package: 'com.virtuallab.mobile'
