@@ -1,16 +1,26 @@
 // src/screens/main/ProfileScreen.tsx
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
-import { auth } from '../../services/firebase/config';
-import { signOut } from 'firebase/auth';
+import { useAppDispatch } from '../../store/hooks';
+import { logoutUser } from '../../store/slices/authSlice';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../../navigation/types';
+import { theme } from '../../theme';
+import { moderateScale, verticalScale } from '../../utils/responsive';
+
+type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 const { width, height } = Dimensions.get('window');
 
-const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+const ProfileScreen: React.FC = () => {
+  const navigation = useNavigation<ProfileScreenNavigationProp>();
+  const dispatch = useAppDispatch();
+
   const handleSignOut = async () => {
     try {
-      await signOut(auth);
-      navigation.replace('Login');
+      await dispatch(logoutUser()).unwrap();
+      // Navigation will be handled automatically by the auth state change
     } catch (error) {
       console.error('Sign Out Error:', error);
     }
@@ -21,12 +31,12 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       {/* Profile Image Section */}
       <View style={styles.profileSection}>
         <Image
-          source={require('../../assets/profile-picture.png')} // Replace with your profile picture
+          source={require('../../assets/profile-picture.png')}
           style={styles.profileImage}
         />
         <TouchableOpacity style={styles.editIcon}>
           <Image
-            source={require('../../assets/edit-icon.jpg')} // Replace with your edit icon
+            source={require('../../assets/edit-icon.jpg')}
             style={styles.iconImage}
           />
         </TouchableOpacity>
@@ -53,8 +63,6 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
         <Text style={styles.signOutText}>Sign Out</Text>
       </TouchableOpacity>
-
-      
     </View>
   );
 };
@@ -62,79 +70,77 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.background.default,
     alignItems: 'center',
-    justifyContent: 'center', // Centers content vertically
-    paddingVertical: height * 0.05,
+    justifyContent: 'center',
+    paddingVertical: verticalScale(20),
   },
   profileSection: {
     position: 'relative',
-    marginBottom: height * 0.05, // Increased margin to push items slightly downward
+    marginBottom: verticalScale(20),
   },
   profileImage: {
-    width: width * 0.4,
-    height: width * 0.4,
-    borderRadius: (width * 0.4) / 2,
+    width: moderateScale(120),
+    height: moderateScale(120),
+    borderRadius: moderateScale(60),
   },
   editIcon: {
     position: 'absolute',
     right: 0,
     bottom: 0,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 5,
+    backgroundColor: theme.colors.background.paper,
+    borderRadius: moderateScale(20),
+    padding: moderateScale(5),
   },
   iconImage: {
-    width: 20,
-    height: 20,
+    width: moderateScale(20),
+    height: moderateScale(20),
   },
   nameText: {
-    fontSize: 24,
+    fontSize: moderateScale(24),
     fontWeight: 'bold',
-    marginBottom: 5,
-    textAlign: 'center',
+    marginBottom: verticalScale(5),
   },
   emailText: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: height * 0.05, // Increased margin for spacing
-    textAlign: 'center',
+    fontSize: moderateScale(16),
+    color: theme.colors.text.secondary,
+    marginBottom: verticalScale(20),
   },
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     width: '80%',
-    marginBottom: height * 0.05,
+    marginBottom: verticalScale(20),
   },
   statItem: {
     alignItems: 'center',
   },
   statValue: {
-    fontSize: 18,
+    fontSize: moderateScale(18),
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: verticalScale(5),
   },
   statLabel: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: moderateScale(14),
+    color: theme.colors.text.secondary,
   },
   divider: {
     width: 1,
-    height: 40,
-    backgroundColor: '#DDD',
-    marginHorizontal: 20,
+    height: verticalScale(40),
+    backgroundColor: theme.colors.grey[300],
+    marginHorizontal: moderateScale(20),
   },
   signOutButton: {
-    backgroundColor: '#4D2C5E',
-    borderRadius: 10,
-    paddingVertical: 15,
-    paddingHorizontal: 40,
-    marginBottom: height * 0.05,
+    backgroundColor: theme.colors.primary.main,
+    borderRadius: moderateScale(10),
+    paddingVertical: verticalScale(15),
+    paddingHorizontal: moderateScale(40),
+    marginBottom: verticalScale(20),
   },
   signOutText: {
-    color: '#FFFFFF',
-    fontSize: 16,
+    color: theme.colors.primary.contrast,
+    fontSize: moderateScale(16),
     fontWeight: 'bold',
   },
 });

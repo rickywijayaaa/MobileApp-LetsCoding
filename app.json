@@ -4,13 +4,7 @@
     "slug": "virtual-lab-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#4D2C5E"
-    },
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
@@ -18,7 +12,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/appicon.png",
+        "foregroundImage": "./src/assets/appicon.png",
         "backgroundColor": "#4D2C5E"
       },
       "package": "com.virtuallab.mobile"
