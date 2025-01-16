@@ -1,8 +1,8 @@
 // src/theme/colors.ts
 export const colors = {
   primary: {
-    main: '#4D2C5E',
-    light: '#6E4C7E',
+    main: '#5C2C5E',
+    light: '#C05CC4',
     dark: '#2C1A3E',
     contrast: '#FFFFFF'
   },

@@ -6,6 +6,8 @@ import { MainTabParamList } from './types';
 import { HomeScreen } from '../screens/main/HomeScreen';
 import { LearnScreen } from '../screens/main/LearnScreen';
 import ProfileScreen from '../screens/main/ProfileScreen';
+import { CourseNavigator } from './CourseNavigator';
+import { theme } from '../theme';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -15,8 +17,8 @@ export const MainNavigator = () => {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarShowLabel: true,
-        tabBarActiveTintColor: '#4D2C5E',
-        tabBarInactiveTintColor: '#999',
+        tabBarActiveTintColor: theme.colors.primary.main,
+        tabBarInactiveTintColor: theme.colors.text.disabled,
         tabBarStyle: {
           backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
@@ -53,7 +55,13 @@ export const MainNavigator = () => {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Learn" component={LearnScreen} />
+      <Tab.Screen 
+        name="Learn"
+        component={CourseNavigator}
+        options={{
+          tabBarLabel: 'Explore'
+        }}
+      />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );

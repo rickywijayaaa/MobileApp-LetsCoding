@@ -15,3 +15,10 @@ export type MainTabParamList = {
   Learn: undefined;
   Profile: undefined;
 };
+
+export type CourseStackParamList = {
+  CourseList: undefined;
+  CourseDetails: { courseId: string };
+  CourseContent: { courseId: string; sectionId: string };
+  CoursePractice: { courseId: string; sectionId: string };
+};
