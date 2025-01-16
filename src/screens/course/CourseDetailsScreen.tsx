@@ -1,5 +1,5 @@
 // src/screens/course/CourseDetailsScreen.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, ScrollView, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -7,6 +7,9 @@ import { CourseStackParamList } from '../../navigation/types';
 import { Typography } from '../../components/common/Typography/Typography';
 import { MOCK_COURSES } from '../../data/mockCourses';
 import { theme } from '../../theme';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { selectCourseProgress, setCurrentCourse } from '../../store/slices/progressSlice';
+import { Feather } from '@expo/vector-icons';
 
 type CourseDetailsRouteProp = RouteProp<CourseStackParamList, 'CourseDetails'>;
 type CourseDetailsNavigationProp = StackNavigationProp<CourseStackParamList, 'CourseDetails'>;
@@ -15,9 +18,27 @@ export const CourseDetailsScreen: React.FC = () => {
   const route = useRoute<CourseDetailsRouteProp>();
   const navigation = useNavigation<CourseDetailsNavigationProp>();
   const [activeTab, setActiveTab] = useState<'content' | 'details'>('content');
+  const dispatch = useAppDispatch(); // Add this
+  const courseId = route.params.courseId;
+  const courseProgress = useAppSelector(state => selectCourseProgress(state, courseId));
+
+  // Initialize course progress when screen loads
+  useEffect(() => {
+    dispatch(setCurrentCourse(courseId));
+  }, [courseId, dispatch]);
 
   // Find course data based on the courseId from navigation params
   const course = MOCK_COURSES.find(c => c.id === route.params.courseId);
+
+  const isSubsectionCompleted = (subsectionId: string, isQuiz: boolean) => {
+    if (!courseProgress) return false;
+    
+    if (isQuiz) {
+      return courseProgress.completedQuizzes.some(quiz => quiz.quizId === subsectionId);
+    } else {
+      return courseProgress.completedLessons.includes(subsectionId);
+    }
+  };
 
   if (!course) {
     return (
@@ -88,29 +109,47 @@ export const CourseDetailsScreen: React.FC = () => {
                   {section.title}
                 </Typography>
                 
-                {section.subsections.map((subsection) => (
-                  <TouchableOpacity
-                    key={subsection.id}
-                    style={styles.subsectionItem}
-                    onPress={() => 
-                      subsection.duration 
-                        ? handleSectionPress(section.id)
-                        : handlePracticePress(section.id)
-                    }
-                  >
-                    <View style={styles.subsectionContent}>
-                      <Typography variant="body1">
-                        {subsection.title}
-                      </Typography>
-                      <Typography variant="caption" color="secondary">
-                        {subsection.duration 
-                          ? `${subsection.duration} mins`
-                          : `${subsection.questionCount} questions`
-                        }
-                      </Typography>
-                    </View>
-                  </TouchableOpacity>
-                ))}
+                {section.subsections.map((subsection) => {
+                  const isQuiz = Boolean(subsection.questionCount);
+                  const isCompleted = isSubsectionCompleted(subsection.id, isQuiz);
+                  
+                  return (
+                    <TouchableOpacity
+                      key={subsection.id}
+                      style={[
+                        styles.subsectionItem,
+                        isCompleted && styles.completedSubsection
+                      ]}
+                      onPress={() => 
+                        subsection.duration 
+                          ? handleSectionPress(section.id)
+                          : handlePracticePress(section.id)
+                      }
+                    >
+                      <View style={styles.subsectionContent}>
+                        <View style={styles.subsectionLeft}>
+                          {isCompleted && (
+                            <Feather 
+                              name="check-circle" 
+                              size={20} 
+                              color={theme.colors.success.main}
+                              style={styles.completionIcon}
+                            />
+                          )}
+                          <Typography variant="body1">
+                            {subsection.title}
+                          </Typography>
+                        </View>
+                        <Typography variant="caption" color="secondary">
+                          {subsection.duration 
+                            ? `${subsection.duration} mins`
+                            : `${subsection.questionCount} questions`
+                          }
+                        </Typography>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             ))}
           </View>
@@ -228,5 +267,17 @@ const styles = StyleSheet.create({
   },
   description: {
     lineHeight: 24,
+  },
+  subsectionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  completionIcon: {
+    marginRight: theme.spacing.sm,
+  },
+  completedSubsection: {
+    backgroundColor: `${theme.colors.success.main}10`,
+    borderColor: theme.colors.success.main,
   },
 });

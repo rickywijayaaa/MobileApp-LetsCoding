@@ -8,11 +8,15 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
+import { useAppSelector } from '../../store/hooks';
 import { moderateScale, verticalScale, horizontalScale } from '../../utils/responsive';
 
 const { width } = Dimensions.get('window');
 
 export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+  // Get user data from auth state
+  const user = useAppSelector(state => state.auth.user);
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Header */}
@@ -24,11 +28,12 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           />
           <View style={styles.headerTextContainer}>
             <Text style={styles.greetingText}>Welcome back!</Text>
-            <Text style={styles.nameText}>Arvyno Wijaya</Text>
+            <Text style={styles.nameText}>{user?.displayName || 'User'}</Text>
           </View>
         </View>
       </View>
 
+      {/* Rest of your component remains the same... */}
       {/* Tutor Section */}
       <View style={styles.sectionContainer}>
         <View style={styles.sectionHeaderContainer}>
@@ -41,7 +46,7 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         <View style={styles.cardContainer}>
           <View style={styles.card}>
             <Image
-              source={require('../../assets/tutor1.jpg')} // Replace with actual image path
+              source={require('../../assets/tutor1.jpg')}
               style={styles.cardImage}
             />
             <Text style={styles.cardText}>Marketing & Business</Text>
@@ -49,7 +54,7 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
           <View style={styles.card}>
             <Image
-              source={require('../../assets/tutor2.jpg')} // Replace with actual image path
+              source={require('../../assets/tutor2.jpg')}
               style={styles.cardImage}
             />
             <Text style={styles.cardText}>Photography & Video</Text>
@@ -57,7 +62,7 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
           <View style={styles.card}>
             <Image
-              source={require('../../assets/tutor3.jpg')} // Replace with actual image path
+              source={require('../../assets/tutor3.jpg')}
               style={styles.cardImage}
             />
             <Text style={styles.cardText}>Web & App Design</Text>
@@ -74,7 +79,7 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             onPress={() => navigation.navigate('Learn')}
           >
             <Image
-              source={require('../../assets/oop.jpg')} // Replace with actual image path
+              source={require('../../assets/oop.jpg')}
               style={styles.recommendationImage}
             />
             <Text style={styles.recommendationTitle}>Object Oriented Programming</Text>
@@ -88,7 +93,7 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             onPress={() => navigation.navigate('Learn')}
           >
             <Image
-              source={require('../../assets/python.jpg')} // Replace with actual image path
+              source={require('../../assets/python.jpg')}
               style={styles.recommendationImage}
             />
             <Text style={styles.recommendationTitle}>Python Fundamental</Text>
@@ -135,6 +140,7 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  // Your existing styles remain unchanged...
   container: {
     padding: moderateScale(18),
   },
@@ -163,7 +169,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   sectionContainer: {
-    marginTop: verticalScale(5), // Added marginTop for each section
+    marginTop: verticalScale(5),
     marginBottom: verticalScale(24),
   },
   sectionHeaderContainer: {
@@ -233,7 +239,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     borderRadius: 8,
     padding: moderateScale(12),
-    marginTop: verticalScale(20), // Added marginTop for "Coming Soon" cards
+    marginTop: verticalScale(20),
   },
   comingSoonTitle: {
     fontSize: moderateScale(14),
@@ -264,5 +270,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
-
