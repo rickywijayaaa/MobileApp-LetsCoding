@@ -1,4 +1,3 @@
-// app.config.ts
 import { ExpoConfig } from '@expo/config';
 
 const config: ExpoConfig = {
@@ -7,7 +6,7 @@ const config: ExpoConfig = {
   owner: 'letscoding',
   version: '1.0.0',
   orientation: 'portrait',
-  scheme: 'virtuallab', // Add URL scheme for deep linking
+  scheme: 'virtuallab', // URL scheme for deep linking
   userInterfaceStyle: 'light',
   updates: {
     fallbackToCacheTimeout: 0,
@@ -25,6 +24,14 @@ const config: ExpoConfig = {
     },
     package: 'com.virtuallab.mobile'
   },
+  web: {
+    favicon: './src/assets/favicon.png',
+    bundler: 'metro', // Use Metro for web builds
+    build: {
+      output: 'web-build' // Define output directory for web builds
+    }
+  },
+  platforms: ['ios', 'android', 'web'], // Ensure all platforms are supported
   extra: {
     eas: {
       projectId: '396b4c3d-7001-47a5-9f66-f99c6e119458'
