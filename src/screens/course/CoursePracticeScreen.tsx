@@ -1,4 +1,3 @@
-// src/screens/course/CoursePracticeScreen.tsx
 import React, { useState } from 'react';
 import { 
   View, 
@@ -18,11 +17,10 @@ import { theme } from '../../theme';
 import { useAppDispatch } from '@/store/hooks';
 import { recordQuizScore } from '@/store/slices/progressSlice';
 
-// Mock questions for development
 const mockQuestions: Question[] = [
   {
     id: '1',
-    type: 'multiple-choice' as const,
+    type: 'multiple-choice',
     text: 'What is the primary purpose of Python\'s "if __name__ == \'__main__\'" statement?',
     options: [
       'To define the main function',
@@ -88,7 +86,6 @@ export const CoursePracticeScreen: React.FC = () => {
   const { courseId, sectionId } = route.params;
   
   const handleQuizComplete = (finalScore: number) => {
-    // Record the quiz score
     dispatch(recordQuizScore({
       courseId,
       quizId: sectionId,
@@ -175,107 +172,54 @@ export const CoursePracticeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#4D2C5E',
   },
-  header: {
-    height: 218,
-    paddingTop: 42,
-    paddingBottom: 42,
-    paddingHorizontal: 80,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 84,
-  },
-  courseIcon: {
-    width: 134,
-    height: 134,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  iconInner: {
-    width: 101,
-    height: 101,
-    borderWidth: 8,
-    borderColor: 'white',
-    position: 'absolute',
-  },
-  iconSlash: {
-    width: 18,
-    height: 36,
-    borderWidth: 8,
-    borderColor: 'white',
-    position: 'absolute',
-    top: 49,
-    left: 46,
-  },
-  iconBar: {
-    width: 42,
-    borderWidth: 4,
-    borderColor: 'white',
-    position: 'absolute',
-    top: 67,
-    left: 46,
-  },
-  whiteText: {
-    color: 'white',
-  } as TextStyle,
-  headerText: {
-    fontSize: 59,
-    fontFamily: 'Prompt',
-    fontWeight: '400',
-    color: 'white',
-  } as TextStyle,
   content: {
     flex: 1,
     justifyContent: 'space-between',
     paddingHorizontal: theme.spacing.lg,
-    paddingTop: theme.spacing.xl,
+    paddingTop: theme.spacing.xxl,
     paddingBottom: theme.spacing.xxl,
   },
   titleSection: {
-    marginTop: 150,
+    marginTop: theme.spacing.xl, // Increased margin for proper spacing
   },
   title: {
-    fontSize: 100,
+    fontSize: 48, // Reduced size for proper layout
     fontWeight: '700',
-    marginBottom: 25,
+    marginBottom: theme.spacing.md,
     color: 'white',
   } as TextStyle,
   infoContainer: {
-    width: 430,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 25,
+    marginBottom: theme.spacing.md,
   },
   divider: {
-    width: 51,
-    height: 0,
-    borderWidth: 1,
-    borderColor: 'white',
-    transform: [{rotate: '90deg'}],
+    width: 1,
+    height: 14,
+    backgroundColor: 'white',
+    marginHorizontal: theme.spacing.sm,
   },
   subtitle: {
-    fontSize: 42,
+    fontSize: 16, // Reduced size
     fontWeight: '400',
     color: 'white',
+    marginTop: theme.spacing.sm,
   } as TextStyle,
   startButton: {
-    width: 1000,
-    height: 200,
+    width: '90%',
+    height: 50, // Adjusted size
     backgroundColor: 'white',
-    borderRadius: 30,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',
-    marginBottom: 50,
+    marginBottom: theme.spacing.xxl,
+    marginTop: theme.spacing.lg,
   },
   startButtonText: {
-    fontSize: 64,
+    fontSize: 18, // Adjusted font size
     fontWeight: '700',
     color: theme.colors.text.primary,
   } as TextStyle,
@@ -285,10 +229,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: theme.spacing.xl,
   },
+  whiteText: {
+    color: 'white',
+  } as TextStyle,
   exitButton: {
     marginTop: theme.spacing.xl,
     backgroundColor: theme.colors.background.paper,
     padding: theme.spacing.md,
     borderRadius: 8,
-  }
+  },
 });
+
+

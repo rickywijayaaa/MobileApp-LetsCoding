@@ -1,9 +1,6 @@
-// src/components/course/CourseList.tsx
 import React from 'react';
-import { ImageSourcePropType, ScrollView, StyleSheet, View } from 'react-native';
-import { CourseCard } from './CourseCard';
-import { Typography } from '../common/Typography/Typography';
-import { theme } from '../../theme';
+import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { moderateScale, verticalScale, horizontalScale } from '../../utils/responsive';
 
 interface Course {
   id: string;
@@ -11,7 +8,7 @@ interface Course {
   description: string;
   studentCount: number;
   sectionCount: number;
-  imageUrl: ImageSourcePropType;
+  imageUrl: any;
 }
 
 interface CourseListProps {
@@ -20,61 +17,75 @@ interface CourseListProps {
   onCoursePress: (courseId: string) => void;
 }
 
-export const CourseList: React.FC<CourseListProps> = ({ 
-  courses, 
-  searchQuery,
-  onCoursePress 
-}) => {
-  const filteredCourses = courses.filter(course =>
+export const CourseList: React.FC<CourseListProps> = ({ courses, searchQuery, onCoursePress }) => {
+  const filteredCourses = courses.filter((course) =>
     course.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  return (
-    <ScrollView style={styles.container}>
-      <View style={styles.headerContainer}>
-        <View style={styles.divider} />
-        <Typography variant="h2" style={styles.headerText}>
-          Recommended Courses
-        </Typography>
-        <View style={styles.divider} />
+  const renderCourseItem = ({ item }: { item: Course }) => (
+    <TouchableOpacity style={styles.card} onPress={() => onCoursePress(item.id)}>
+      <View style={styles.imageContainer}>
+        <Image source={item.imageUrl} style={styles.image} />
       </View>
+      <View style={styles.textContainer}>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.description} numberOfLines={2}>
+          {item.description}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
 
-      <View style={styles.courseList}>
-        {filteredCourses.map((course) => (
-          <CourseCard
-            key={course.id}
-            title={course.title}
-            description={course.description}
-            studentCount={course.studentCount}
-            sectionCount={course.sectionCount}
-            imageUrl={course.imageUrl}
-            onPress={() => onCoursePress(course.id)}
-          />
-        ))}
-      </View>
-    </ScrollView>
+  return (
+    <FlatList
+      data={filteredCourses}
+      keyExtractor={(item) => item.id}
+      renderItem={renderCourseItem}
+      contentContainerStyle={styles.listContainer}
+    />
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  listContainer: {
+    paddingVertical: verticalScale(10),
   },
-  headerContainer: {
+  card: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: theme.spacing.lg,
-    paddingHorizontal: theme.spacing.lg,
+    backgroundColor: '#fff',
+    borderRadius: moderateScale(8),
+    marginBottom: verticalScale(12),
+    padding: moderateScale(10),
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2,
   },
-  headerText: {
-    marginHorizontal: theme.spacing.md,
+  imageContainer: {
+    width: horizontalScale(67), // Same width as the image
+    height: verticalScale(55), // Same height as the image
+    backgroundColor: '#4D2C5E', // Background color
+    borderRadius: moderateScale(8), // Same border radius as the image
+    justifyContent: 'center',
+    alignItems: 'center', // Center the image inside the container
+    marginRight: horizontalScale(10),
   },
-  divider: {
+  image: {
+    width: '100%',
+    height: '100%',
+    borderRadius: moderateScale(8),
+  },
+  textContainer: {
     flex: 1,
-    height: 2,
-    backgroundColor: theme.colors.grey[300],
   },
-  courseList: {
-    padding: theme.spacing.md,
+  title: {
+    fontSize: moderateScale(14),
+    fontWeight: 'bold',
+    marginBottom: verticalScale(4),
+  },
+  description: {
+    fontSize: moderateScale(12),
+    color: '#555',
   },
 });
