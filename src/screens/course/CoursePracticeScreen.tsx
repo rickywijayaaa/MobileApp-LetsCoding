@@ -12,10 +12,11 @@ import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CourseStackParamList } from '../../navigation/types';
 import { Typography } from '../../components/common/Typography/Typography';
-import { MOCK_COURSES } from '../../data/mockCourses';
 import QuizComponent from '../../components/quiz/QuizComponent';
-import { Question } from '../../components/quiz/QuizComponent';
+import type { Question } from '../../components/quiz/QuizComponent';
 import { theme } from '../../theme';
+import { useAppDispatch } from '@/store/hooks';
+import { recordQuizScore } from '@/store/slices/progressSlice';
 
 // Mock questions for development
 const mockQuestions: Question[] = [
@@ -83,7 +84,17 @@ export const CoursePracticeScreen: React.FC = () => {
     setQuizStarted(true);
   };
 
+  const dispatch = useAppDispatch();
+  const { courseId, sectionId } = route.params;
+  
   const handleQuizComplete = (finalScore: number) => {
+    // Record the quiz score
+    dispatch(recordQuizScore({
+      courseId,
+      quizId: sectionId,
+      score: finalScore
+    }));
+    
     setScore(finalScore);
     setQuizCompleted(true);
   };
