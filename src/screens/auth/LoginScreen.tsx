@@ -1,4 +1,3 @@
-// src/screens/auth/LoginScreen.tsx
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -13,7 +12,8 @@ import {
   Platform,
   ActivityIndicator,
   Keyboard,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  ScrollView,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { loginUser, clearError } from '../../store/slices/authSlice';
@@ -25,6 +25,8 @@ import { moderateScale, verticalScale, horizontalScale } from '../../utils/respo
 WebBrowser.maybeCompleteAuthSession();
 
 const { width, height } = Dimensions.get('window');
+
+const isWeb = Platform.OS === 'web';
 
 const LoginScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const dispatch = useAppDispatch();
@@ -64,7 +66,7 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   useEffect(() => {
     if (error) {
       Alert.alert('Authentication Error', error, [
-        { text: 'OK', onPress: () => dispatch(clearError()) }
+        { text: 'OK', onPress: () => dispatch(clearError()) },
       ]);
     }
   }, [error]);
@@ -83,89 +85,96 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const handleLogin = async () => {
     try {
       await dispatch(loginUser({ email, password })).unwrap();
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
       >
-        <View style={styles.contentContainer}>
-          {/* Logo Section - Hidden when keyboard is visible on small screens */}
-          {(!isKeyboardVisible || height > 700) && (
-            <View style={styles.logoContainer}>
-              <Image
-                source={require('../../assets/appicon.png')}
-                style={styles.logo}
-                resizeMode="contain"
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.container}
+        >
+          <View style={styles.innerContainer}>
+            {/* Logo Section */}
+            {(!isKeyboardVisible || height > 700) && (
+              <View style={styles.logoContainer}>
+                <Image
+                  source={require('../../assets/appicon.png')}
+                  style={styles.logo}
+                  resizeMode="contain"
+                />
+                <Text style={styles.welcomeText}>Welcome back!</Text>
+              </View>
+            )}
+
+            {/* Input Section */}
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Email"
+                placeholderTextColor={theme.colors.text.secondary}
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoComplete="email"
+                textContentType="emailAddress"
               />
-              <Text style={styles.welcomeText}>Welcome back!</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Password"
+                placeholderTextColor={theme.colors.text.secondary}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                autoComplete="password"
+                textContentType="password"
+              />
             </View>
-          )}
 
-          {/* Input Section */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Email"
-              placeholderTextColor={theme.colors.text.secondary}
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-              textContentType="emailAddress"
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Password"
-              placeholderTextColor={theme.colors.text.secondary}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoComplete="password"
-              textContentType="password"
-            />
+            {/* Action Buttons */}
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.loginButton, loading && styles.disabledButton]}
+                onPress={handleLogin}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <Text style={styles.loginButtonText}>Login</Text>
+                )}
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.googleButton, !request && styles.disabledButton]}
+                onPress={() => promptAsync()}
+                disabled={!request}
+              >
+                <Image
+                  source={require('../../assets/google_icon.png')}
+                  style={styles.googleIcon}
+                />
+                <Text style={styles.googleButtonText}>Sign in with Google</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Navigation Links */}
+            <View style={styles.linkContainer}>
+              <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                <Text style={styles.link}>Don't have an account? Register</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-
-          {/* Action Buttons */}
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[styles.loginButton, loading && styles.disabledButton]}
-              onPress={handleLogin}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="white" />
-              ) : (
-                <Text style={styles.loginButtonText}>Login</Text>
-              )}
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.googleButton, !request && styles.disabledButton]}
-              onPress={() => promptAsync()}
-              disabled={!request}
-            >
-              <Image 
-                source={require('../../assets/google_icon.png')} 
-                style={styles.googleIcon}
-              />
-              <Text style={styles.googleButtonText}>Sign in with Google</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Navigation Links */}
-          <View style={styles.linkContainer}>
-            <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-              <Text style={styles.link}>Don't have an account? Register</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
+      </ScrollView>
     </TouchableWithoutFeedback>
   );
 };
@@ -174,29 +183,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background.default,
-  },
-  contentContainer: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: moderateScale(20),
+  },
+  innerContainer: {
+    width: '100%',
+    maxWidth: 420, // Ensures layout is constrained for web
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    padding: 20,
+    boxShadow: Platform.OS === 'web' ? '0 4px 6px rgba(0, 0, 0, 0.1)' : undefined,
+    elevation: 3,
   },
   logoContainer: {
     alignItems: 'center',
     marginBottom: verticalScale(40),
   },
   logo: {
-    width: horizontalScale(150),
-    height: verticalScale(150),
+    width: horizontalScale(isWeb ? 150 : 150),
+    height: verticalScale(isWeb ? 150 : 150),
   },
   welcomeText: {
-    fontSize: moderateScale(24),
+    fontSize: moderateScale(isWeb ? 10 : 24),
     fontWeight: '600',
     color: theme.colors.text.primary,
     marginTop: verticalScale(20),
+    textAlign: 'center',
   },
   inputContainer: {
-    width: '100%',
     marginBottom: verticalScale(20),
   },
   input: {
@@ -206,14 +220,13 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(10),
     marginBottom: verticalScale(15),
     paddingHorizontal: horizontalScale(15),
-    fontSize: moderateScale(16),
+    fontSize: moderateScale(isWeb ? 7 : 16),
     color: theme.colors.text.primary,
     borderWidth: 1,
     borderColor: theme.colors.grey[300],
   },
   buttonContainer: {
-    width: '100%',
-    alignItems: 'center',
+    marginBottom: verticalScale(20),
   },
   loginButton: {
     width: '100%',
@@ -226,7 +239,7 @@ const styles = StyleSheet.create({
   },
   loginButtonText: {
     color: theme.colors.primary.contrast,
-    fontSize: moderateScale(16),
+    fontSize: moderateScale(isWeb ? 10 : 16),
     fontWeight: '600',
   },
   googleButton: {
@@ -239,16 +252,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: verticalScale(20),
   },
   googleIcon: {
-    width: moderateScale(24),
-    height: moderateScale(24),
+    width: moderateScale(isWeb ? 10 : 24),
+    height: moderateScale(isWeb ? 10 : 24),
     marginRight: horizontalScale(10),
   },
   googleButtonText: {
     color: theme.colors.text.primary,
-    fontSize: moderateScale(16),
+    fontSize: moderateScale(isWeb ? 8 : 16),
     fontWeight: '500',
   },
   linkContainer: {
@@ -256,7 +268,7 @@ const styles = StyleSheet.create({
   },
   link: {
     color: theme.colors.primary.main,
-    fontSize: moderateScale(14),
+    fontSize: moderateScale(isWeb ? 7 : 14),
     fontWeight: '500',
   },
   disabledButton: {

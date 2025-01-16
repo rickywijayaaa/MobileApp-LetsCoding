@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, StyleSheet, Text, Dimensions, Platform } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
+
+const { width } = Dimensions.get('window');
 
 const WebLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <View style={styles.outerContainer}>
-      <View style={styles.container}>
-        <Text style={styles.header}>My Web App</Text>
+      <View style={styles.innerContainer}>
         <View style={styles.content}>{children}</View>
       </View>
     </View>
@@ -15,35 +16,23 @@ const WebLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 const styles = StyleSheet.create({
   outerContainer: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f5f5f5', // Light gray background
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 16, // Add padding for smaller screens
   },
-  container: {
+  innerContainer: {
     width: '100%',
-    maxWidth: 420, // Ensures the container does not exceed 420px
+    maxWidth: 480, // Mimic a mobile screen width, slightly wider than 420px
     backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-    padding: 20,
-    boxShadow: Platform.OS === 'web' ? '0 4px 6px rgba(0, 0, 0, 0.1)' : undefined,
-    elevation: 3,
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#333',
+    borderRadius: 16,
+    overflow: 'hidden',
+    padding: 16,
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
   },
   content: {
     flex: 1,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 2,
+    padding: 16,
   },
 });
 

@@ -1,4 +1,3 @@
-// src/screens/auth/RegisterScreen.tsx
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -14,7 +13,7 @@ import {
   ActivityIndicator,
   Keyboard,
   TouchableWithoutFeedback,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { registerUser, clearError } from '../../store/slices/authSlice';
@@ -22,13 +21,14 @@ import { theme } from '../../theme';
 import { moderateScale, verticalScale, horizontalScale } from '../../utils/responsive';
 
 const { width, height } = Dimensions.get('window');
+const isWeb = Platform.OS === 'web';
 
 const passwordRequirements = {
   minLength: 8,
   hasUpperCase: /[A-Z]/,
   hasLowerCase: /[a-z]/,
   hasNumber: /\d/,
-  hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/
+  hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/,
 };
 
 const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
@@ -46,14 +46,8 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      () => setKeyboardVisible(true)
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      () => setKeyboardVisible(false)
-    );
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
 
     return () => {
       keyboardDidShowListener.remove();
@@ -67,9 +61,7 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   useEffect(() => {
     if (error) {
-      Alert.alert('Registration Error', error, [
-        { text: 'OK', onPress: () => dispatch(clearError()) }
-      ]);
+      Alert.alert('Registration Error', error, [{ text: 'OK', onPress: () => dispatch(clearError()) }]);
     }
   }, [error]);
 
@@ -82,7 +74,6 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   const validatePassword = (password: string): boolean => {
     const errors = [];
-
     if (password.length < passwordRequirements.minLength) {
       errors.push(`At least ${passwordRequirements.minLength} characters`);
     }
@@ -125,123 +116,112 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     try {
       await dispatch(registerUser({ email, password })).unwrap();
 
-      // Show success alert before navigation
       Alert.alert('Success', 'Account created successfully!', [
-        { text: 'OK', onPress: () => navigation.navigate('Login') }
+        { text: 'OK', onPress: () => navigation.navigate('Login') },
       ]);
-    } catch (error) {
-      // Error is handled by the error effect
-    }
+    } catch (error) {}
   };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          showsVerticalScrollIndicator={false}
-        >
-          {(!isKeyboardVisible || height > 700) && (
-            <View style={styles.logoContainer}>
-              <Image
-                source={require('../../assets/appicon.png')}
-                style={styles.logo}
-                resizeMode="contain"
-              />
-              <Text style={styles.welcomeText}>Create Account</Text>
-            </View>
-          )}
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.container}>
+          <View style={styles.innerContainer}>
+            {(!isKeyboardVisible || height > 700) && (
+              <View style={styles.logoContainer}>
+                <Image
+                  source={require('../../assets/appicon.png')}
+                  style={styles.logo}
+                  resizeMode="contain"
+                />
+                <Text style={styles.welcomeText}>Create Account</Text>
+              </View>
+            )}
 
-          <View style={styles.inputContainer}>
-            <View style={styles.inputWrapper}>
-              <TextInput
-                style={[styles.input, emailError && styles.inputError]}
-                placeholder="Email"
-                placeholderTextColor={theme.colors.text.secondary}
-                value={email}
-                onChangeText={(text) => {
-                  setEmail(text);
-                  if (emailError) validateEmail(text);
-                }}
-                onBlur={() => validateEmail(email)}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoComplete="email"
-              />
-              {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+            <View style={styles.inputContainer}>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  style={[styles.input, emailError && styles.inputError]}
+                  placeholder="Email"
+                  placeholderTextColor={theme.colors.text.secondary}
+                  value={email}
+                  onChangeText={text => {
+                    setEmail(text);
+                    if (emailError) validateEmail(text);
+                  }}
+                  onBlur={() => validateEmail(email)}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                />
+                {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+              </View>
+
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  style={[styles.input, passwordError && styles.inputError]}
+                  placeholder="Password"
+                  placeholderTextColor={theme.colors.text.secondary}
+                  value={password}
+                  onChangeText={text => {
+                    setPassword(text);
+                    setShowPasswordRequirements(true);
+                    if (passwordError) validatePassword(text);
+                    if (confirmPassword) validateConfirmPassword(text, confirmPassword);
+                  }}
+                  onBlur={() => validatePassword(password)}
+                  secureTextEntry
+                  autoComplete="password-new"
+                />
+                {showPasswordRequirements && (
+                  <Text style={styles.requirementsText}>
+                    Password must contain: {'\n'}
+                    • At least 8 characters{'\n'}
+                    • One uppercase letter{'\n'}
+                    • One lowercase letter{'\n'}
+                    • One number{'\n'}
+                    • One special character
+                  </Text>
+                )}
+                {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+              </View>
+
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  style={[styles.input, confirmPasswordError && styles.inputError]}
+                  placeholder="Confirm Password"
+                  placeholderTextColor={theme.colors.text.secondary}
+                  value={confirmPassword}
+                  onChangeText={text => {
+                    setConfirmPassword(text);
+                    if (confirmPasswordError) validateConfirmPassword(password, text);
+                  }}
+                  onBlur={() => validateConfirmPassword(password, confirmPassword)}
+                  secureTextEntry
+                  autoComplete="password-new"
+                />
+                {confirmPasswordError ? <Text style={styles.errorText}>{confirmPasswordError}</Text> : null}
+              </View>
             </View>
 
-            <View style={styles.inputWrapper}>
-              <TextInput
-                style={[styles.input, passwordError && styles.inputError]}
-                placeholder="Password"
-                placeholderTextColor={theme.colors.text.secondary}
-                value={password}
-                onChangeText={(text) => {
-                  setPassword(text);
-                  setShowPasswordRequirements(true);
-                  if (passwordError) validatePassword(text);
-                  if (confirmPassword) validateConfirmPassword(text, confirmPassword);
-                }}
-                onBlur={() => validatePassword(password)}
-                secureTextEntry
-                autoComplete="password-new"
-              />
-              {showPasswordRequirements && (
-                <Text style={styles.requirementsText}>
-                  Password must contain: {'\n'}
-                  • At least 8 characters{'\n'}
-                  • One uppercase letter{'\n'}
-                  • One lowercase letter{'\n'}
-                  • One number{'\n'}
-                  • One special character
-                </Text>
-              )}
-              {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.registerButton, loading && styles.disabledButton]}
+                onPress={handleRegister}
+                disabled={loading}
+              >
+                {loading ? <ActivityIndicator color="white" /> : <Text style={styles.registerButtonText}>Create Account</Text>}
+              </TouchableOpacity>
             </View>
 
-            <View style={styles.inputWrapper}>
-              <TextInput
-                style={[styles.input, confirmPasswordError && styles.inputError]}
-                placeholder="Confirm Password"
-                placeholderTextColor={theme.colors.text.secondary}
-                value={confirmPassword}
-                onChangeText={(text) => {
-                  setConfirmPassword(text);
-                  if (confirmPasswordError) validateConfirmPassword(password, text);
-                }}
-                onBlur={() => validateConfirmPassword(password, confirmPassword)}
-                secureTextEntry
-                autoComplete="password-new"
-              />
-              {confirmPasswordError ? <Text style={styles.errorText}>{confirmPasswordError}</Text> : null}
+            <View style={styles.linkContainer}>
+              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                <Text style={styles.link}>Already have an account? Login</Text>
+              </TouchableOpacity>
             </View>
           </View>
-
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[styles.registerButton, loading && styles.disabledButton]}
-              onPress={handleRegister}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color={theme.colors.primary.contrast} />
-              ) : (
-                <Text style={styles.registerButtonText}>Create Account</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.linkContainer}>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text style={styles.link}>Already have an account? Login</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
+      </ScrollView>
     </TouchableWithoutFeedback>
   );
 };
@@ -249,31 +229,41 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: theme.colors.background.default,
   },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: verticalScale(20),
-    paddingHorizontal: moderateScale(20),
+    padding: verticalScale(20),
+  },
+  innerContainer: {
+    width: '100%',
+    maxWidth: 420,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    padding: 20,
+    boxShadow: Platform.OS === 'web' ? '0 4px 6px rgba(0, 0, 0, 0.1)' : undefined,
+    elevation: 3,
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: verticalScale(20),
+    marginBottom: verticalScale(40),
   },
   logo: {
-    width: horizontalScale(150),
-    height: verticalScale(150),
+    width: horizontalScale(isWeb ? 150 : 150),
+    height: verticalScale(isWeb ? 150 : 150),
   },
   welcomeText: {
-    fontSize: moderateScale(24),
+    fontSize: moderateScale(isWeb ? 14 : 24),
     fontWeight: '600',
     color: theme.colors.text.primary,
     marginTop: verticalScale(20),
+    textAlign: 'center',
   },
   inputContainer: {
-    width: '100%',
     marginBottom: verticalScale(20),
   },
   inputWrapper: {
@@ -285,7 +275,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background.paper,
     borderRadius: moderateScale(10),
     paddingHorizontal: horizontalScale(15),
-    fontSize: moderateScale(16),
+    fontSize: moderateScale(isWeb ? 8 : 16),
     color: theme.colors.text.primary,
     borderWidth: 1,
     borderColor: theme.colors.grey[300],
@@ -295,18 +285,17 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: theme.colors.error.main,
-    fontSize: moderateScale(12),
+    fontSize: moderateScale(isWeb ? 6 : 12),
     marginTop: verticalScale(5),
   },
   requirementsText: {
     color: theme.colors.text.secondary,
-    fontSize: moderateScale(12),
+    fontSize: moderateScale(isWeb ? 8 : 12),
     marginTop: verticalScale(5),
-    lineHeight: moderateScale(18),
+    lineHeight: moderateScale(isWeb ? 7 : 18),
   },
   buttonContainer: {
-    width: '100%',
-    alignItems: 'center',
+    marginBottom: verticalScale(20),
   },
   registerButton: {
     width: '100%',
@@ -315,23 +304,23 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(10),
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: verticalScale(15),
   },
   registerButtonText: {
     color: theme.colors.primary.contrast,
-    fontSize: moderateScale(16),
+    fontSize: moderateScale(isWeb ? 8 : 16),
     fontWeight: '600',
-  },
-  disabledButton: {
-    opacity: 0.7,
   },
   linkContainer: {
     alignItems: 'center',
-    marginTop: verticalScale(20),
   },
   link: {
     color: theme.colors.primary.main,
-    fontSize: moderateScale(14),
+    fontSize: moderateScale(isWeb ? 7 : 14),
     fontWeight: '500',
+  },
+  disabledButton: {
+    opacity: 0.7,
   },
 });
 
