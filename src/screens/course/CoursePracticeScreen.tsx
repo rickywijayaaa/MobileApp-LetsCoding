@@ -16,6 +16,7 @@ import type { Question } from '../../components/quiz/QuizComponent';
 import { theme } from '../../theme';
 import { useAppDispatch } from '../../store/hooks';
 import { recordQuizScore } from '../../store/slices/progressSlice';
+import { MOCK_COURSES } from '../../data/mockCourses';
 
 const mockQuestions: Question[] = [
   {
@@ -86,9 +87,27 @@ export const CoursePracticeScreen: React.FC = () => {
   const { courseId, sectionId } = route.params;
   
   const handleQuizComplete = (finalScore: number) => {
+    console.log('Quiz completed with score:', finalScore);
+    
+    const course = MOCK_COURSES.find(c => c.id === courseId);
+    const section = course?.sections.find(s => s.id === sectionId);
+    
+    console.log('Found course:', course?.id);
+    console.log('Found section:', section?.id);
+    
+    // Find the practice subsection
+    const practiceSubsection = section?.subsections.find(sub => sub.questionCount);
+    console.log('Found practice subsection:', practiceSubsection?.id);
+    
+    if (!practiceSubsection) {
+      console.error('No practice subsection found');
+      return;
+    }
+  
     dispatch(recordQuizScore({
       courseId,
       quizId: sectionId,
+      subsectionId: practiceSubsection.id,
       score: finalScore
     }));
     

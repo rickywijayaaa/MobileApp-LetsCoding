@@ -42,16 +42,30 @@ export const CourseContentScreen: React.FC = () => {
   const isCompleted = courseProgress?.completedLessons.includes(section?.id || '');
 
   const handleLessonComplete = () => {
-    if (!course || !section) return;
+    if (!course || !section) {
+      console.error('No course or section found');
+      return;
+    }
+  
+    console.log('Course:', course.id);
+    console.log('Section:', section.id);
   
     try {
-      // Dispatch the completion action (synchronously)
+      // Find the content subsection
+      const contentSubsection = section.subsections.find(sub => sub.duration);
+      console.log('Content subsection:', contentSubsection?.id);
+      
+      if (!contentSubsection) {
+        console.error('No content subsection found');
+        return;
+      }
+  
       dispatch(completeLesson({
         courseId: course.id,
-        lessonId: section.id
+        lessonId: section.id,
+        subsectionId: contentSubsection.id
       }));
   
-      // Navigate back immediately after dispatching
       navigation.navigate('CourseDetails', { 
         courseId: course.id 
       });
@@ -60,7 +74,7 @@ export const CourseContentScreen: React.FC = () => {
       console.error('Failed to mark lesson as complete:', error);
     }
   };
-
+  
   // Error handling for missing course data
   if (!course || !section) {
     return (
