@@ -124,7 +124,6 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.container}>
           <View style={styles.innerContainer}>
             {(!isKeyboardVisible || height > 700) && (
@@ -221,7 +220,6 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             </View>
           </View>
         </KeyboardAvoidingView>
-      </ScrollView>
     </TouchableWithoutFeedback>
   );
 };
@@ -233,19 +231,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: theme.colors.background.default,
   },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: verticalScale(20),
-  },
+  // scrollContainer: {
+  //   flexGrow: 1,
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   padding: verticalScale(20),
+  // },
   innerContainer: {
-    width: '100%',
-    maxWidth: 420,
-    backgroundColor: '#FFFFFF',
+    width: isWeb ? '100%' : '100%', // Ensure width is flexible on all platforms
+    maxWidth: isWeb ? 600 : 600, // 480px for web, 600px for mobile
+    backgroundColor: '#FFFFF',
     borderRadius: 10,
     padding: 20,
-    boxShadow: Platform.OS === 'web' ? '0 4px 6px rgba(0, 0, 0, 0.1)' : undefined,
+    boxShadow: Platform.OS === 'web' ? '0 6px 6px rgba(0, 0, 0, 0.1)' : undefined,
     elevation: 3,
   },
   logoContainer: {
@@ -257,7 +255,7 @@ const styles = StyleSheet.create({
     height: verticalScale(isWeb ? 150 : 150),
   },
   welcomeText: {
-    fontSize: moderateScale(isWeb ? 14 : 24),
+    fontSize: moderateScale(isWeb ? 12 : 24),
     fontWeight: '600',
     color: theme.colors.text.primary,
     marginTop: verticalScale(20),

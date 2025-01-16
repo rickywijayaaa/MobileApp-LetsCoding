@@ -188,11 +188,11 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     width: '100%',
-    maxWidth: 420, // Ensures layout is constrained for web
+    maxWidth: isWeb ? 480 : 600 , // Ensures layout is constrained for web
     backgroundColor: '#FFFFFF',
     borderRadius: 10,
     padding: 20,
-    boxShadow: Platform.OS === 'web' ? '0 4px 6px rgba(0, 0, 0, 0.1)' : undefined,
+    boxShadow: Platform.OS === 'web' ? '0 6px 6px rgba(0, 0, 0, 0.1)' : undefined,
     elevation: 3,
   },
   logoContainer: {
