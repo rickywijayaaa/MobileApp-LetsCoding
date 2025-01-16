@@ -1,11 +1,49 @@
 // src/store/slices/progressSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { CourseProgress, ProgressState } from '../../types/progress';
+import { MOCK_COURSES } from '../../data/mockCourses';
 
 const initialState: ProgressState = {
   courseProgress: {},
   currentCourseId: null,
   currentSectionId: null
+};
+
+// Helper function to check if a course is completed
+const checkCourseCompletion = (
+  progress: CourseProgress,
+  courseId: string
+): boolean => {
+  const course = MOCK_COURSES.find(c => c.id === courseId);
+  if (!course) return false;
+
+  // Collect all sections that require completion
+  let allSectionsCompleted = true;
+  
+  for (const section of course.sections) {
+    const hasContentSection = section.subsections.some(sub => sub.duration);
+    const hasQuizSection = section.subsections.some(sub => sub.questionCount);
+
+    // Check content completion
+    if (hasContentSection) {
+      const isContentCompleted = progress.completedLessons.includes(section.id);
+      if (!isContentCompleted) {
+        allSectionsCompleted = false;
+        break;
+      }
+    }
+
+    // Check quiz completion
+    if (hasQuizSection) {
+      const isQuizCompleted = progress.completedQuizzes.some(quiz => quiz.quizId === section.id);
+      if (!isQuizCompleted) {
+        allSectionsCompleted = false;
+        break;
+      }
+    }
+  }
+
+  return allSectionsCompleted;
 };
 
 const progressSlice = createSlice({
@@ -14,7 +52,15 @@ const progressSlice = createSlice({
   reducers: {
     loadSavedProgress: (state, action: PayloadAction<Record<string, CourseProgress>>) => {
       state.courseProgress = action.payload;
+      // Update completion status for all courses
+      Object.keys(state.courseProgress).forEach(courseId => {
+        const progress = state.courseProgress[courseId];
+        if (progress) {
+          progress.isCompleted = checkCourseCompletion(progress, courseId);
+        }
+      });
     },
+
     setCurrentCourse: (state, action: PayloadAction<string>) => {
       state.currentCourseId = action.payload;
       // Initialize course progress if it doesn't exist
@@ -23,7 +69,8 @@ const progressSlice = createSlice({
           courseId: action.payload,
           completedLessons: [],
           completedQuizzes: [],
-          lastAccessedAt: new Date().toISOString()
+          lastAccessedAt: new Date().toISOString(),
+          isCompleted: false
         };
       }
     },
@@ -37,6 +84,8 @@ const progressSlice = createSlice({
       if (courseProgress && !courseProgress.completedLessons.includes(action.payload.lessonId)) {
         courseProgress.completedLessons.push(action.payload.lessonId);
         courseProgress.lastAccessedAt = new Date().toISOString();
+        // Update completion status
+        courseProgress.isCompleted = checkCourseCompletion(courseProgress, action.payload.courseId);
       }
     },
     
@@ -62,6 +111,8 @@ const progressSlice = createSlice({
         });
         
         courseProgress.lastAccessedAt = new Date().toISOString();
+        // Update completion status
+        courseProgress.isCompleted = checkCourseCompletion(courseProgress, courseId);
       }
     },
     
@@ -71,7 +122,7 @@ const progressSlice = createSlice({
   }
 });
 
-// Selectors
+// Existing Selectors
 export const selectCourseProgress = (state: { progress: ProgressState }, courseId: string) => 
   state.progress.courseProgress[courseId];
 
@@ -87,7 +138,12 @@ export const selectQuizScore = (
 export const selectCompletedLessons = (state: { progress: ProgressState }, courseId: string) =>
   state.progress.courseProgress[courseId]?.completedLessons || [];
 
+// New Selector for completed courses count
+export const selectCompletedCoursesCount = (state: { progress: ProgressState }) => 
+  Object.values(state.progress.courseProgress).filter(progress => progress.isCompleted).length;
+
 export const {
+  loadSavedProgress,
   setCurrentCourse,
   setCurrentSection,
   completeLesson,

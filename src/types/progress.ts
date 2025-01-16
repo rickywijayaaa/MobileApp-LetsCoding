@@ -10,6 +10,7 @@ export interface QuizScore {
     completedLessons: string[];
     completedQuizzes: QuizScore[];
     lastAccessedAt: string;
+    isCompleted: boolean;
   }
   
   export interface ProgressState {

@@ -1,8 +1,9 @@
 // src/screens/main/ProfileScreen.tsx
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
-import { useAppDispatch } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logoutUser } from '../../store/slices/authSlice';
+import { selectCompletedCoursesCount } from '../../store/slices/progressSlice';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/types';
@@ -16,6 +17,23 @@ const { width, height } = Dimensions.get('window');
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
   const dispatch = useAppDispatch();
+  const completedCoursesCount = useAppSelector(selectCompletedCoursesCount);
+  const user = useAppSelector(state => state.auth.user);
+
+  // Format the member since date
+  const formatMemberSince = (timestamp: string | null) => {
+    if (!timestamp) return 'N/A';
+    
+    const date = new Date(parseInt(timestamp));
+    return date.toLocaleDateString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
+      year: 'numeric'
+    });
+  };
+
+  // Get the formatted member since date, handling undefined case
+  const memberSince = formatMemberSince(user?.createdAt || null);
 
   const handleSignOut = async () => {
     try {
@@ -43,18 +61,18 @@ const ProfileScreen: React.FC = () => {
       </View>
 
       {/* User Info Section */}
-      <Text style={styles.nameText}>Arvyno Wijaya</Text>
-      <Text style={styles.emailText}>arvynowijaya@gmail.com</Text>
+      <Text style={styles.nameText}>{user?.displayName || 'User'}</Text>
+      <Text style={styles.emailText}>{user?.email || 'No email'}</Text>
 
       {/* Stats Section */}
       <View style={styles.statsContainer}>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>36</Text>
+          <Text style={styles.statValue}>{completedCoursesCount}</Text>
           <Text style={styles.statLabel}>Completed Courses</Text>
         </View>
         <View style={styles.divider} />
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>01/01/2025</Text>
+          <Text style={styles.statValue}>{memberSince}</Text>
           <Text style={styles.statLabel}>Member Since</Text>
         </View>
       </View>
