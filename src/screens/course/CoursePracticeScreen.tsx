@@ -14,8 +14,8 @@ import { Typography } from '../../components/common/Typography/Typography';
 import QuizComponent from '../../components/quiz/QuizComponent';
 import type { Question } from '../../components/quiz/QuizComponent';
 import { theme } from '../../theme';
-import { useAppDispatch } from '@/store/hooks';
-import { recordQuizScore } from '@/store/slices/progressSlice';
+import { useAppDispatch } from '../../store/hooks';
+import { recordQuizScore } from '../../store/slices/progressSlice';
 
 const mockQuestions: Question[] = [
   {
