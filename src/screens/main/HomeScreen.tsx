@@ -49,7 +49,7 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               source={require('../../assets/tutor1.jpg')}
               style={styles.cardImage}
             />
-            <Text style={styles.cardText}>Marketing & Business</Text>
+            <Text style={styles.cardText}>Adi Mulyadi, S.T</Text>
           </View>
 
           <View style={styles.card}>
@@ -57,7 +57,7 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               source={require('../../assets/tutor2.jpg')}
               style={styles.cardImage}
             />
-            <Text style={styles.cardText}>Photography & Video</Text>
+            <Text style={styles.cardText}>Ika Suciati, M.T</Text>
           </View>
 
           <View style={styles.card}>
@@ -65,7 +65,7 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               source={require('../../assets/tutor3.jpg')}
               style={styles.cardImage}
             />
-            <Text style={styles.cardText}>Web & App Design</Text>
+            <Text style={styles.cardText}>Rara Sondang, S.Kom</Text>
           </View>
         </View>
       </View>
@@ -109,7 +109,7 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         <Text style={styles.sectionTitle}>Coming Soon Course</Text>
         <View style={styles.comingSoonContainer}>
           <View style={styles.comingSoonCard}>
-            <Text style={styles.comingSoonTitle}>Blender Training Courses - Full Lifetime Access</Text>
+            <Text style={styles.comingSoonTitle}>Data Visualization Courses - Python</Text>
             <View style={styles.progressBarBackground}>
               <View style={styles.progressBarFill} />
             </View>
@@ -122,7 +122,7 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           </View>
 
           <View style={styles.comingSoonCard}>
-            <Text style={styles.comingSoonTitle}>Interaction Design Founda— Figma Course</Text>
+            <Text style={styles.comingSoonTitle}>Pandas Dataframe Course - Python</Text>
             <View style={styles.progressBarBackground}>
               <View style={styles.progressBarFill} />
             </View>
